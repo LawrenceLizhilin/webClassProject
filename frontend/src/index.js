@@ -1,12 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import LandPage from './LandPage';
+import Timetable from './Timetable';
 import reportWebVitals from './reportWebVitals';
+import { Route,Routes,BrowserRouter as Router } from 'react-router-dom'
 
-ReactDOM.render (
+ReactDOM.render(
     <React.StrictMode>
-        <App/>
+        <Router>
+            <Routes>
+                <Route path="/" element={<LandPage/>}/>
+                <Route path="/Timetable" element={<Timetable/>}/>
+            </Routes>
+        </Router>
     </React.StrictMode>,
     document.getElementById('root')
 );

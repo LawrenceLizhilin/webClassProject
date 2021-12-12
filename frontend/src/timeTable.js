@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useMemo, useEffect } from 'react';
 import { Tabs, DatePicker, Space, Table } from 'antd';
 import moment from 'moment';
+import './Timetable.css';
 
 const { TabPane } = Tabs;
 const columns = [
@@ -23,7 +24,7 @@ const columns = [
 export default function Timetable() {
     let [date, setDate] = useState(moment().add(-10, 'month'));
     let [pickValue, setPickValue] = useState(moment());
-    
+
     function mGetDate(tempDate) {
         let year = moment(tempDate).toDate().getFullYear();
         let month = moment(tempDate).toDate().getMonth() + 1;
@@ -46,8 +47,8 @@ export default function Timetable() {
 
     return (
         <div>
-            <div>
-                <DatePicker id="datePicker" allowClear picker="month" placeholder="按年月查詢"
+            <div className="datePicker" >
+                <DatePicker allowClear picker="month" placeholder="按年月查詢"
                     value={pickValue}
                     onSelect={
                         function (value) {
