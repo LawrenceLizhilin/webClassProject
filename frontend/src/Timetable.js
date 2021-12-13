@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useMemo, useEffect } from 'react';
-import { Tabs, DatePicker, Space, Table, Menu, Button, Modal, message } from 'antd';
+import { Tabs, DatePicker, Table, Menu, Button, Modal, message, Select, Divider, TimePicker } from 'antd';
 import {
     AppstoreOutlined,
     PieChartOutlined,
@@ -11,6 +11,7 @@ import './Timetable.css';
 
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
+const { Option } = Select;
 const columns = [
     {
         title: '小組',
@@ -32,6 +33,9 @@ export default function Timetable() {
     let [pickValue, setPickValue] = useState(moment());
     let [monthCheck, setMonthCheck] = useState(false);
     let [cardVisible, setCardVisible] = useState(false);
+    let [absenceVisible, setAbsenceVisible] = useState(false);
+    let [selectPattern, setSelectPattern] = useState("");
+    let [chooseSingleDay, setChooseSingleDay] = useState(moment());
 
     function mGetDate(tempDate) {
         let year = moment(tempDate).toDate().getFullYear();
@@ -63,8 +67,10 @@ export default function Timetable() {
                         }}>
                             上班打卡
                         </Menu.Item>
-                        <Menu.Item key="Absence" icon={<AppstoreOutlined />}>
-                            請假申請
+                        <Menu.Item key="Absence" icon={<AppstoreOutlined />} onClick={function () {
+                            setAbsenceVisible(true);
+                        }}>
+                            申請休假
                         </Menu.Item>
                         <Menu.Item key="Update">
                             更新數據
@@ -89,13 +95,51 @@ export default function Timetable() {
                         <Button onClick={function () {
                             setCardVisible(false);
                         }}>取消</Button>,
-                        <Button type="primary" onClick={function(){
+                        <Button type="primary" onClick={function () {
                             setCardVisible(false);
                             message.info("打卡成功!");
                         }}>確認打卡</Button>
                     ]}>
                         <span>今天是</span><span>{moment().format("YYYY-MM-DD")}</span>
                         <div>是否確認打卡上班?</div>
+                    </Modal>
+                    <Modal title="休假申请" visible={absenceVisible} footer={[
+                        <Button onClick={function () {
+                            setAbsenceVisible(false);
+                        }}>取消</Button>,
+                        <Button type="primary" onClick={function () {
+                            setAbsenceVisible(false);
+                            message.info("成功發送申請!");
+                        }}>發送申請</Button>
+                    ]}>
+                        <Select className="selectPattern" placeholder="選擇休假模式" onSelect={function (value) {
+                            setSelectPattern(value);
+                        }}>
+                            <Option value="singleDay">單日休假申請</Option>
+                            <Option value="multiDays">多日休假申請</Option>
+                        </Select>
+                        <Divider></Divider>
+                        {selectPattern === "singleDay" && <div>
+                            <DatePicker defaultValue={moment()} onChange={function (date) {
+                                setChooseSingleDay(date);
+                            }} disabledDate={function (date) {
+                                let currentMonth = moment();
+                                let calYear = date.toDate().getFullYear();
+                                let calMonth = date.toDate().getMonth();
+                                let year = currentMonth.toDate().getFullYear();
+                                let month = currentMonth.toDate().getMonth();
+                                if (calYear === year && calMonth === month) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            }} />
+                            {chooseSingleDay != null && <div>您選擇的日期是<span>{chooseSingleDay.format("YYYY-MM-DD")}</span></div>}
+                        </div>}
+                        {selectPattern === "multiDays" && <div>
+
+                        </div>}
+
                     </Modal>
                 </div>
                 {monthCheck && <div className="datePicker" >
