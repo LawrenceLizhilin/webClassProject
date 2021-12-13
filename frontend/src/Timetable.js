@@ -57,6 +57,7 @@ export default function Timetable() {
             <div>
                 <div className='Menu'>
                     <Menu mode="horizontal" theme='dark'>
+                        <Menu.Item key="Word" disabled>欢迎,lawrence!</Menu.Item>
                         <Menu.Item key="Card" icon={<DesktopOutlined />} onClick={function () {
                             setCardVisible(true);
                         }}>
@@ -83,12 +84,12 @@ export default function Timetable() {
                         </SubMenu>
                     </Menu>
                 </div>
-                <div>
+                <div className="Modals">
                     <Modal title="打卡上班" visible={cardVisible} footer={[
                         <Button onClick={function () {
                             setCardVisible(false);
                         }}>取消</Button>,
-                        <Button onClick={function(){
+                        <Button type="primary" onClick={function(){
                             setCardVisible(false);
                             message.info("打卡成功!");
                         }}>確認打卡</Button>
@@ -110,12 +111,12 @@ export default function Timetable() {
             </div>
             <div>
                 <Tabs defaultActiveKey="1">
-                    <TabPane tab="加班日程表" key="1">
+                    <TabPane tab="考勤日程表" key="1">
                         <Table columns={memorizedColumns} scroll={{ x: 'max-content', y: 800 }}
                             pagination={false}
                             bordered />
                     </TabPane>
-                    <TabPane tab="Tab 2" key="2">
+                    <TabPane tab="加勤日程表" key="2">
                         Content of Tab Pane 2
                     </TabPane>
 
