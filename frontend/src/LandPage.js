@@ -26,7 +26,7 @@ export default function LandPage() {
                 工時系統
             </div>
             <div className='LandPlace'>
-                <div className='LandWord'>登錄</div>
+                <div className='LandWord'>登入</div>
                 <div style={{ width: 200 }}>
                     <Input placeholder="請輸入用戶名" size='middle' onChange={function (event) {
                         setPostName(event.target.value);
@@ -34,7 +34,7 @@ export default function LandPage() {
                     <Input.Password placeholder="請輸入密碼" size='middle' onChange={function (event) {
                         setPostPassWord(event.target.value);
                     }}></Input.Password>
-                    <Button onClick={() => handleLanding("/Timetable")}>登錄</Button>
+                    <Button onClick={() => handleLanding("/Timetable")}>登入</Button>
                 </div>
             </div>
         </div>

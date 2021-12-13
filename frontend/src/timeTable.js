@@ -1,9 +1,15 @@
 import React from 'react';
 import { useState, useMemo, useEffect } from 'react';
-import { Tabs, DatePicker, Space, Table } from 'antd';
+import { Tabs, DatePicker, Space, Table, Menu, Button, Modal, message } from 'antd';
+import {
+    AppstoreOutlined,
+    PieChartOutlined,
+    DesktopOutlined,
+} from '@ant-design/icons';
 import moment from 'moment';
 import './Timetable.css';
 
+const { SubMenu } = Menu;
 const { TabPane } = Tabs;
 const columns = [
     {
@@ -15,15 +21,17 @@ const columns = [
     }, {
         title: '姓名',
         dataIndex: 'name',
-        fixed:'left',
+        fixed: 'left',
         key: 'name',
         width: 100
     },
 ]
 
 export default function Timetable() {
-    let [date, setDate] = useState(moment().add(-10, 'month'));
+    let [date, setDate] = useState(moment());
     let [pickValue, setPickValue] = useState(moment());
+    let [monthCheck, setMonthCheck] = useState(false);
+    let [cardVisible, setCardVisible] = useState(false);
 
     function mGetDate(tempDate) {
         let year = moment(tempDate).toDate().getFullYear();
@@ -31,15 +39,14 @@ export default function Timetable() {
         let d = new Date(year, month, 0);
         return d.getDate();
     }
-    // useEffect(() => {
-
-    // }, [date]);
 
     const memorizedColumns = useMemo(() => {
         let clonedColumns = [...columns];
         for (let i = 1; i <= mGetDate(date); i++) {
             let num = i.toString();
-            clonedColumns.push({ key: num, title: num, width: 60, dataIndex: num });
+            clonedColumns.push({
+                key: num, title: num, width: 60, dataIndex: num,
+            });
         }
         clonedColumns.push({ key: '加班總時長', title: '加班總時長', width: 150, dataIndex: 'totalHour' });
         return clonedColumns;
@@ -47,15 +54,59 @@ export default function Timetable() {
 
     return (
         <div>
-            <div className="datePicker" >
-                <DatePicker allowClear picker="month" placeholder="按年月查詢"
-                    value={pickValue}
-                    onSelect={
-                        function (value) {
-                            setPickValue(value);
-                            setDate(value);
-                        }
-                    } />
+            <div>
+                <div className='Menu'>
+                    <Menu mode="horizontal" theme='dark'>
+                        <Menu.Item key="Card" icon={<DesktopOutlined />} onClick={function () {
+                            setCardVisible(true);
+                        }}>
+                            上班打卡
+                        </Menu.Item>
+                        <Menu.Item key="Absence" icon={<AppstoreOutlined />}>
+                            請假申請
+                        </Menu.Item>
+                        <Menu.Item key="Update">
+                            更新數據
+                        </Menu.Item>
+                        <Menu.Item key="Confirm">
+                            確認數據
+                        </Menu.Item>
+                        <SubMenu key="check" icon={<PieChartOutlined />} title="篩選方式">
+                            <Menu.Item key="MonthCheck" onClick={function () {
+                                setMonthCheck(true);
+                            }}>按月查詢</Menu.Item>
+                            <Menu.Item key="clear" onClick={function () {
+                                setMonthCheck(false);
+                                setDate(moment());
+                                setPickValue(moment());
+                            }}>還原</Menu.Item>
+                        </SubMenu>
+                    </Menu>
+                </div>
+                <div>
+                    <Modal title="打卡上班" visible={cardVisible} footer={[
+                        <Button onClick={function () {
+                            setCardVisible(false);
+                        }}>取消</Button>,
+                        <Button onClick={function(){
+                            setCardVisible(false);
+                            message.info("打卡成功!");
+                        }}>確認打卡</Button>
+                    ]}>
+                        <span>今天是</span><span>{moment().format("YYYY-MM-DD")}</span>
+                        <div>是否確認打卡上班?</div>
+                    </Modal>
+                </div>
+                {monthCheck && <div className="datePicker" >
+                    <DatePicker allowClear picker="month" placeholder="按年月查詢"
+                        value={pickValue}
+                        onSelect={
+                            function (value) {
+                                setPickValue(value);
+                                setDate(value);
+                            }
+                        } />
+                </div>}
             </div>
             <div>
                 <Tabs defaultActiveKey="1">
