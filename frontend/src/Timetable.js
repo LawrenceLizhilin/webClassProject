@@ -36,6 +36,8 @@ export default function Timetable() {
     let [absenceVisible, setAbsenceVisible] = useState(false);
     let [selectPattern, setSelectPattern] = useState("");
     let [chooseSingleDay, setChooseSingleDay] = useState(moment());
+    let [startDay,setStartDay] = useState(moment());
+    let [endDay,setEndDay] = useState(moment());
 
    
 
@@ -44,6 +46,13 @@ export default function Timetable() {
         let month = moment(tempDate).toDate().getMonth() + 1;
         let d = new Date(year, month, 0);
         return d.getDate();
+    }
+
+    function getDuration(startDay,endDay){
+        let begin = moment(startDay);
+        let over = moment(endDay);
+        let duration = over.diff(begin,'days');
+        return duration;
     }
 
     const memorizedColumns = useMemo(() => {
@@ -112,11 +121,16 @@ export default function Timetable() {
                             setAbsenceVisible(false);
                         }}>取消</Button>,
                         <Button type="primary" onClick={function () {
-                            setAbsenceVisible(false);
+                            if(getDuration(startDay,endDay) < 0){
+                                message.info("起始日期需小於結束日期!");
+                            }
+                            else{
+                                setAbsenceVisible(false);
                             message.info("成功發送申請!");
+                            }
                         }}>發送申請</Button>
                     ]}onCancel={function(){
-                        setAbsenceVisible(false);
+                            setAbsenceVisible(false);
                     }}>
                         <Select className="selectPattern" placeholder="選擇休假模式" onSelect={function (value) {
                             setSelectPattern(value);
@@ -143,7 +157,38 @@ export default function Timetable() {
                             {chooseSingleDay != null && <div>您選擇的日期是<span>{chooseSingleDay.format("YYYY-MM-DD")}</span></div>}
                         </div>}
                         {selectPattern === "multiDays" && <div>
-
+                            <span>選擇開始時間</span><span>{<DatePicker defaultValue={moment()} onChange={function(date){
+                                setStartDay(date);
+                            }} disabledDate={function(date){
+                                let currentMonth = moment();
+                                let calYear = date.toDate().getFullYear();
+                                let calMonth = date.toDate().getMonth();
+                                let year = currentMonth.toDate().getFullYear();
+                                let month = currentMonth.toDate().getMonth();
+                                if (calYear === year && calMonth === month) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            }}></DatePicker>}</span>
+                            <span>選擇結束時間</span><span>{<DatePicker defaultValue={moment()} onChange={function(date){
+                                setEndDay(date);
+                            }} disabledDate={function(date){
+                                let currentMonth = moment();
+                                let calYear = date.toDate().getFullYear();
+                                let calMonth = date.toDate().getMonth();
+                                let year = currentMonth.toDate().getFullYear();
+                                let month = currentMonth.toDate().getMonth();
+                                if (calYear === year && calMonth === month) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            }}></DatePicker>}</span>
+                            {startDay != null && endDay!= null && <div>
+                                <div>您選擇的日期是<span>{startDay.format("YYYY-MM-DD")}</span><span>至</span><span>{endDay.format("YYYY-MM-DD")}</span></div>
+                                <div>共計請假<span>{getDuration(startDay,endDay)}</span>天</div>
+                            </div>}
                         </div>}
 
                     </Modal>
