@@ -37,6 +37,8 @@ export default function Timetable() {
     let [selectPattern, setSelectPattern] = useState("");
     let [chooseSingleDay, setChooseSingleDay] = useState(moment());
 
+   
+
     function mGetDate(tempDate) {
         let year = moment(tempDate).toDate().getFullYear();
         let month = moment(tempDate).toDate().getMonth() + 1;
@@ -99,7 +101,9 @@ export default function Timetable() {
                             setCardVisible(false);
                             message.info("打卡成功!");
                         }}>確認打卡</Button>
-                    ]}>
+                    ]}onCancel={function(){
+                        setCardVisible(false);
+                    }}>
                         <span>今天是</span><span>{moment().format("YYYY-MM-DD")}</span>
                         <div>是否確認打卡上班?</div>
                     </Modal>
@@ -111,7 +115,9 @@ export default function Timetable() {
                             setAbsenceVisible(false);
                             message.info("成功發送申請!");
                         }}>發送申請</Button>
-                    ]}>
+                    ]}onCancel={function(){
+                        setAbsenceVisible(false);
+                    }}>
                         <Select className="selectPattern" placeholder="選擇休假模式" onSelect={function (value) {
                             setSelectPattern(value);
                         }}>
