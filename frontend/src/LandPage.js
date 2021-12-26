@@ -2,22 +2,27 @@ import React from "react";
 import { Button, Input,message} from 'antd';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {useLocation } from 'react-router';
+import 'axios';
 import './LandPage.css';
+import axios from "axios";
+;
 
 export default function LandPage() {
     const navigate = useNavigate();
+    const sleep = (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+      }
 
     let [postName, setPostName] = useState("");
     let [postPassword, setPostPassWord] = useState("");
 
-
-    function handleLanding(link) {
-        if (postName === "lawrence" && postPassword === "1234") {
-            navigate(link);
-        }
-        else {
-            message.info("用戶名或密碼錯誤!")
-        }
+    async function handleLanding(link) {
+        const account = postName;
+        const url = "http://localhost:8080/employee/"+account.toString();
+        const result = await axios.get(url);
+        await sleep(1000);
+        navigate("/Timetable",{state:result.data});
     }
 
     return (

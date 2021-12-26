@@ -1,6 +1,7 @@
 import React from 'react';
 import { useState, useMemo, useEffect } from 'react';
 import { Tabs, DatePicker, Table, Menu, Button, Modal, message, Select, Divider, TimePicker } from 'antd';
+import { useLocation } from 'react-router';
 import {
     AppstoreOutlined,
     PieChartOutlined,
@@ -8,25 +9,14 @@ import {
 } from '@ant-design/icons';
 import moment from 'moment';
 import './Timetable.css';
+import axios from 'axios';
 
 const { SubMenu } = Menu;
 const { TabPane } = Tabs;
 const { Option } = Select;
 const columns = [
-    {
-        title: '小組',
-        dataIndex: 'dept',
-        fixed: 'left',
-        key: 'dept',
-        width: 100
-    }, {
-        title: '姓名',
-        dataIndex: 'name',
-        fixed: 'left',
-        key: 'name',
-        width: 100
-    },
 ]
+
 
 export default function Timetable() {
     let [date, setDate] = useState(moment());
@@ -38,8 +28,32 @@ export default function Timetable() {
     let [chooseSingleDay, setChooseSingleDay] = useState(moment());
     let [startDay,setStartDay] = useState(moment());
     let [endDay,setEndDay] = useState(moment());
+    let [punchData,setPunchData] = useState([{}]);
 
-   
+    const location = useLocation();
+    const employeeImformation = location.state;
+
+
+    useEffect(()=>{
+        async function getPunchData(){
+            const result = await axios.get("http://localhost:8080/employee/overtime");
+            const filterData = result.data.filter((item) =>  item.employee_id === employeeImformation.employee_id && moment(item.in).format("YYYY-MM") === date.format("YYYY-MM"));
+            const resultData = filterData.map((item,index)=>{
+                let sign = [item.in];
+                sign.forEach(inner => {
+                    let day = moment(inner).format("DD");
+                    let searchDate = moment(inner).format("YYYY-MM");
+                    if(item.employee_id === employeeImformation.employee_id && searchDate === date.format("YYYY-MM")){
+                        item[day+''] = item.time_diff;     
+                    }           
+                })
+                return item;
+            })
+            setPunchData(resultData);
+        }
+        getPunchData();
+    },[date])
+
 
     function mGetDate(tempDate) {
         let year = moment(tempDate).toDate().getFullYear();
@@ -60,10 +74,9 @@ export default function Timetable() {
         for (let i = 1; i <= mGetDate(date); i++) {
             let num = i.toString();
             clonedColumns.push({
-                key: num, title: num, width: 60, dataIndex: num,
+                key: num, title: num, width: 60,dataIndex: num
             });
         }
-        clonedColumns.push({ key: '加班總時長', title: '加班總時長', width: 150, dataIndex: 'totalHour' });
         return clonedColumns;
     }, [date]);
 
@@ -72,7 +85,8 @@ export default function Timetable() {
             <div>
                 <div className='Menu'>
                     <Menu mode="horizontal" theme='dark'>
-                        <Menu.Item key="Word" disabled>欢迎,lawrence!</Menu.Item>
+                        <Menu.Item key="Word" disabled>欢迎,{employeeImformation.employee_name}!</Menu.Item>
+                        <Menu.Item key="Dept" disabled>{employeeImformation.employee_dep}</Menu.Item>
                         <Menu.Item key="Card" icon={<DesktopOutlined />} onClick={function () {
                             setCardVisible(true);
                         }}>
@@ -209,7 +223,8 @@ export default function Timetable() {
                     <TabPane tab="考勤日程表" key="1">
                         <Table columns={memorizedColumns} scroll={{ x: 'max-content', y: 800 }}
                             pagination={false}
-                            bordered />
+                            bordered ={false}
+                            dataSource={punchData}/>
                     </TabPane>
                     <TabPane tab="加勤日程表" key="2">
                         Content of Tab Pane 2
